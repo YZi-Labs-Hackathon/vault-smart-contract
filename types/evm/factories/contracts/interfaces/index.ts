@@ -3,3 +3,4 @@
 /* eslint-disable */
 export * as iVaultSol from "./IVault.sol";
 export * as iVaultFactorySol from "./IVaultFactory.sol";
+export { IProtocolHelper__factory } from "./IProtocolHelper__factory";

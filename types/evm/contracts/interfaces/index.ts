@@ -5,3 +5,4 @@ import type * as iVaultSol from "./IVault.sol";
 export type { iVaultSol };
 import type * as iVaultFactorySol from "./IVaultFactory.sol";
 export type { iVaultFactorySol };
+export type { IProtocolHelper } from "./IProtocolHelper";

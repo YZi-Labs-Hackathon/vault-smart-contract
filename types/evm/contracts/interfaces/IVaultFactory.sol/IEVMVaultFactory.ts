@@ -29,6 +29,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: AddressLike;
     authority: AddressLike;
+    protocolHelper: AddressLike;
     initDepositAmount: BigNumberish;
     minDepositAmount: BigNumberish;
     maxDepositAmount: BigNumberish;
@@ -40,6 +41,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string,
     underlying: string,
     authority: string,
+    protocolHelper: string,
     initDepositAmount: bigint,
     minDepositAmount: bigint,
     maxDepositAmount: bigint,
@@ -49,6 +51,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: string;
     authority: string;
+    protocolHelper: string;
     initDepositAmount: bigint;
     minDepositAmount: bigint;
     maxDepositAmount: bigint;
@@ -57,16 +60,26 @@ export declare namespace IEVMVaultFactory {
 }
 
 export interface IEVMVaultFactoryInterface extends Interface {
-  getFunction(nameOrSignature: "createNewVault" | "signer"): FunctionFragment;
+  getFunction(
+    nameOrSignature: "collectFees" | "createNewVault" | "signer"
+  ): FunctionFragment;
 
   getEvent(nameOrSignatureOrTopic: "VaultCreated"): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "collectFees",
+    values: [AddressLike, AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "createNewVault",
     values: [IEVMVaultFactory.CreateNewVaultParamsStruct, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "signer", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "collectFees",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "createNewVault",
     data: BytesLike
@@ -135,6 +148,12 @@ export interface IEVMVaultFactory extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  collectFees: TypedContractMethod<
+    [vault: AddressLike, receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   createNewVault: TypedContractMethod<
     [params: IEVMVaultFactory.CreateNewVaultParamsStruct, signature: BytesLike],
     [string],
@@ -145,6 +164,13 @@ export interface IEVMVaultFactory extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "collectFees"
+  ): TypedContractMethod<
+    [vault: AddressLike, receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "createNewVault"
   ): TypedContractMethod<

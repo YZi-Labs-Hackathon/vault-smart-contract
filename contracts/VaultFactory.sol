@@ -19,7 +19,7 @@ contract EVMVaultFactory is
 
     bytes32 public constant CREATE_VAULT_TYPEHASH =
         keccak256(
-            "CreateVault(string name,string symbol,address underlying,address authority,uint256 initDepositAmount,uint256 minDepositAmount,uint256 maxDepositAmount,uint256 deadline)"
+            "CreateVault(string name,string symbol,address underlying,address authority,address protocolHelper,uint256 initDepositAmount,uint256 minDepositAmount,uint256 maxDepositAmount,uint256 deadline)"
         );
 
     address public signer;
@@ -27,6 +27,10 @@ contract EVMVaultFactory is
     function initialize(address _signer) public initializer {
         __Ownable_init(msg.sender);
         __EIP712_init("Partnr Vault Factory", "1.0");
+        signer = _signer;
+    }
+
+    function updateSigner(address _signer) external onlyOwner {
         signer = _signer;
     }
 
@@ -50,6 +54,7 @@ contract EVMVaultFactory is
                 keccak256(bytes(params.symbol)),
                 params.underlying,
                 params.authority,
+                params.protocolHelper,
                 params.initDepositAmount,
                 params.minDepositAmount,
                 params.maxDepositAmount,
@@ -108,6 +113,7 @@ contract EVMVaultFactory is
                 keccak256(bytes(params.symbol)),
                 params.underlying,
                 params.authority,
+                params.protocolHelper,
                 params.initDepositAmount,
                 params.minDepositAmount,
                 params.maxDepositAmount,
@@ -145,5 +151,14 @@ contract EVMVaultFactory is
         }
 
         emit VaultCreated(vault, params.authority, shares);
+    }
+
+    /**
+     * @notice Collect fees from the vault
+     * @param vault The vault to collect fees from
+     */
+    function collectFees(IEVMVault vault, address receiver) external onlyOwner {
+        require(vault.vaultFees() > 0, "VaultFactory: no fees to collect");
+        vault.collectFees(receiver);
     }
 }

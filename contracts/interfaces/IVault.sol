@@ -15,6 +15,8 @@ interface IEVMVault is IERC20 {
         uint256 amount
     );
 
+    event Executed(bytes16 indexed excuteId);
+
     function vaultFees() external view returns (uint256);
 
     function creatorFees() external view returns (uint256);
@@ -42,4 +44,14 @@ interface IEVMVault is IERC20 {
         uint256 deadline,
         bytes calldata signature
     ) external;
+
+    function execute(
+        bytes16 excuteId,
+        address[] calldata targets,
+        bytes[] calldata data,
+        uint256 deadline,
+        bytes calldata signature
+    ) external;
+
+    function collectFees(address receiver) external;
 }

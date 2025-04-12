@@ -64,6 +64,19 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "bytes16",
+        name: "excuteId",
+        type: "bytes16",
+      },
+    ],
+    name: "Executed",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "from",
         type: "address",
@@ -177,6 +190,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "collectFees",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "creatorFees",
     outputs: [
@@ -230,6 +256,39 @@ const _abi = [
         type: "uint256",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes16",
+        name: "excuteId",
+        type: "bytes16",
+      },
+      {
+        internalType: "address[]",
+        name: "targets",
+        type: "address[]",
+      },
+      {
+        internalType: "bytes[]",
+        name: "data",
+        type: "bytes[]",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "signature",
+        type: "bytes",
+      },
+    ],
+    name: "execute",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

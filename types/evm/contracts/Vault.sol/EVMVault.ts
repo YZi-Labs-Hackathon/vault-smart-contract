@@ -29,6 +29,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: AddressLike;
     authority: AddressLike;
+    protocolHelper: AddressLike;
     initDepositAmount: BigNumberish;
     minDepositAmount: BigNumberish;
     maxDepositAmount: BigNumberish;
@@ -40,6 +41,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string,
     underlying: string,
     authority: string,
+    protocolHelper: string,
     initDepositAmount: bigint,
     minDepositAmount: bigint,
     maxDepositAmount: bigint,
@@ -49,6 +51,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: string;
     authority: string;
+    protocolHelper: string;
     initDepositAmount: bigint;
     minDepositAmount: bigint;
     maxDepositAmount: bigint;
@@ -60,27 +63,34 @@ export interface EVMVaultInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "DEPOSIT_TYPEHASH"
+      | "EXECUTE_TYPEHASH"
       | "WITHDRAW_TYPEHASH"
       | "allowance"
       | "approve"
       | "authority"
       | "balanceOf"
+      | "collectCreatorFees"
+      | "collectFees"
       | "creatorFees"
       | "decimals"
       | "deposit"
       | "eip712Domain"
       | "excuteIds"
+      | "execute"
       | "factory"
       | "getVaultValue"
       | "maxDepositAmount"
       | "minDepositAmount"
       | "name"
+      | "protocolHelper"
       | "shareRate"
       | "symbol"
       | "totalSupply"
       | "transfer"
       | "transferFrom"
       | "underlying"
+      | "updateMaxDepositAmount"
+      | "updateMinDepositAmount"
       | "userDeposited"
       | "vaultFees"
       | "withdraw"
@@ -91,12 +101,17 @@ export interface EVMVaultInterface extends Interface {
       | "Approval"
       | "Deposited"
       | "EIP712DomainChanged"
+      | "Executed"
       | "Transfer"
       | "Withdrawn"
   ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "DEPOSIT_TYPEHASH",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "EXECUTE_TYPEHASH",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -114,6 +129,14 @@ export interface EVMVaultInterface extends Interface {
   encodeFunctionData(functionFragment: "authority", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collectCreatorFees",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collectFees",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -140,6 +163,10 @@ export interface EVMVaultInterface extends Interface {
     functionFragment: "excuteIds",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "execute",
+    values: [BytesLike, AddressLike[], BytesLike[], BigNumberish, BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getVaultValue",
@@ -154,6 +181,10 @@ export interface EVMVaultInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "protocolHelper",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "shareRate", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -171,6 +202,14 @@ export interface EVMVaultInterface extends Interface {
   encodeFunctionData(
     functionFragment: "underlying",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateMaxDepositAmount",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateMinDepositAmount",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "userDeposited",
@@ -196,6 +235,10 @@ export interface EVMVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "EXECUTE_TYPEHASH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "WITHDRAW_TYPEHASH",
     data: BytesLike
   ): Result;
@@ -203,6 +246,14 @@ export interface EVMVaultInterface extends Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "authority", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "collectCreatorFees",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "collectFees",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "creatorFees",
     data: BytesLike
@@ -214,6 +265,7 @@ export interface EVMVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "excuteIds", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getVaultValue",
@@ -228,6 +280,10 @@ export interface EVMVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "protocolHelper",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "shareRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
@@ -240,6 +296,14 @@ export interface EVMVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "underlying", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "updateMaxDepositAmount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateMinDepositAmount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "userDeposited",
     data: BytesLike
@@ -288,6 +352,18 @@ export namespace EIP712DomainChangedEvent {
   export type InputTuple = [];
   export type OutputTuple = [];
   export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ExecutedEvent {
+  export type InputTuple = [excuteId: BytesLike];
+  export type OutputTuple = [excuteId: string];
+  export interface OutputObject {
+    excuteId: string;
+  }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
   export type Log = TypedEventLog<Event>;
@@ -375,6 +451,8 @@ export interface EVMVault extends BaseContract {
 
   DEPOSIT_TYPEHASH: TypedContractMethod<[], [string], "view">;
 
+  EXECUTE_TYPEHASH: TypedContractMethod<[], [string], "view">;
+
   WITHDRAW_TYPEHASH: TypedContractMethod<[], [string], "view">;
 
   allowance: TypedContractMethod<
@@ -392,6 +470,18 @@ export interface EVMVault extends BaseContract {
   authority: TypedContractMethod<[], [string], "view">;
 
   balanceOf: TypedContractMethod<[account: AddressLike], [bigint], "view">;
+
+  collectCreatorFees: TypedContractMethod<
+    [receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  collectFees: TypedContractMethod<
+    [receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   creatorFees: TypedContractMethod<[], [bigint], "view">;
 
@@ -428,6 +518,18 @@ export interface EVMVault extends BaseContract {
 
   excuteIds: TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
 
+  execute: TypedContractMethod<
+    [
+      excuteId: BytesLike,
+      targets: AddressLike[],
+      data: BytesLike[],
+      deadline: BigNumberish,
+      signature: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   factory: TypedContractMethod<[], [string], "view">;
 
   getVaultValue: TypedContractMethod<[], [bigint], "view">;
@@ -437,6 +539,8 @@ export interface EVMVault extends BaseContract {
   minDepositAmount: TypedContractMethod<[], [bigint], "view">;
 
   name: TypedContractMethod<[], [string], "view">;
+
+  protocolHelper: TypedContractMethod<[], [string], "view">;
 
   shareRate: TypedContractMethod<[], [bigint], "view">;
 
@@ -457,6 +561,18 @@ export interface EVMVault extends BaseContract {
   >;
 
   underlying: TypedContractMethod<[], [string], "view">;
+
+  updateMaxDepositAmount: TypedContractMethod<
+    [newMaxDepositAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  updateMinDepositAmount: TypedContractMethod<
+    [newMinDepositAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   userDeposited: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
@@ -485,6 +601,9 @@ export interface EVMVault extends BaseContract {
     nameOrSignature: "DEPOSIT_TYPEHASH"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "EXECUTE_TYPEHASH"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "WITHDRAW_TYPEHASH"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
@@ -507,6 +626,12 @@ export interface EVMVault extends BaseContract {
   getFunction(
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[account: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "collectCreatorFees"
+  ): TypedContractMethod<[receiver: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "collectFees"
+  ): TypedContractMethod<[receiver: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "creatorFees"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -548,6 +673,19 @@ export interface EVMVault extends BaseContract {
     nameOrSignature: "excuteIds"
   ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
   getFunction(
+    nameOrSignature: "execute"
+  ): TypedContractMethod<
+    [
+      excuteId: BytesLike,
+      targets: AddressLike[],
+      data: BytesLike[],
+      deadline: BigNumberish,
+      signature: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "factory"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
@@ -561,6 +699,9 @@ export interface EVMVault extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "protocolHelper"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "shareRate"
@@ -588,6 +729,20 @@ export interface EVMVault extends BaseContract {
   getFunction(
     nameOrSignature: "underlying"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "updateMaxDepositAmount"
+  ): TypedContractMethod<
+    [newMaxDepositAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateMinDepositAmount"
+  ): TypedContractMethod<
+    [newMinDepositAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "userDeposited"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
@@ -631,6 +786,13 @@ export interface EVMVault extends BaseContract {
     EIP712DomainChangedEvent.InputTuple,
     EIP712DomainChangedEvent.OutputTuple,
     EIP712DomainChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Executed"
+  ): TypedContractEvent<
+    ExecutedEvent.InputTuple,
+    ExecutedEvent.OutputTuple,
+    ExecutedEvent.OutputObject
   >;
   getEvent(
     key: "Transfer"
@@ -679,6 +841,17 @@ export interface EVMVault extends BaseContract {
       EIP712DomainChangedEvent.InputTuple,
       EIP712DomainChangedEvent.OutputTuple,
       EIP712DomainChangedEvent.OutputObject
+    >;
+
+    "Executed(bytes16)": TypedContractEvent<
+      ExecutedEvent.InputTuple,
+      ExecutedEvent.OutputTuple,
+      ExecutedEvent.OutputObject
+    >;
+    Executed: TypedContractEvent<
+      ExecutedEvent.InputTuple,
+      ExecutedEvent.OutputTuple,
+      ExecutedEvent.OutputObject
     >;
 
     "Transfer(address,address,uint256)": TypedContractEvent<

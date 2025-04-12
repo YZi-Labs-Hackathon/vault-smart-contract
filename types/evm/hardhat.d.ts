@@ -94,6 +94,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Strings__factory>;
     getContractFactory(
+      name: "IProtocolHelper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IProtocolHelper__factory>;
+    getContractFactory(
       name: "IEVMVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IEVMVault__factory>;
@@ -215,6 +219,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Strings>;
     getContractAt(
+      name: "IProtocolHelper",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IProtocolHelper>;
+    getContractAt(
       name: "IEVMVault",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -321,6 +330,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Strings>;
     deployContract(
+      name: "IProtocolHelper",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IProtocolHelper>;
+    deployContract(
       name: "IEVMVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IEVMVault>;
@@ -441,6 +454,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Strings>;
+    deployContract(
+      name: "IProtocolHelper",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IProtocolHelper>;
     deployContract(
       name: "IEVMVault",
       args: any[],

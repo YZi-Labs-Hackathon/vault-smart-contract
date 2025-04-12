@@ -29,8 +29,10 @@ export interface IEVMVaultInterface extends Interface {
       | "allowance"
       | "approve"
       | "balanceOf"
+      | "collectFees"
       | "creatorFees"
       | "deposit"
+      | "execute"
       | "totalSupply"
       | "transfer"
       | "transferFrom"
@@ -41,7 +43,12 @@ export interface IEVMVaultInterface extends Interface {
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic: "Approval" | "Deposited" | "Transfer" | "Withdrawn"
+    nameOrSignatureOrTopic:
+      | "Approval"
+      | "Deposited"
+      | "Executed"
+      | "Transfer"
+      | "Withdrawn"
   ): EventFragment;
 
   encodeFunctionData(
@@ -54,6 +61,10 @@ export interface IEVMVaultInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collectFees",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -70,6 +81,10 @@ export interface IEVMVaultInterface extends Interface {
       BigNumberish,
       BytesLike
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "execute",
+    values: [BytesLike, AddressLike[], BytesLike[], BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -110,10 +125,15 @@ export interface IEVMVaultInterface extends Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "collectFees",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "creatorFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -161,6 +181,18 @@ export namespace DepositedEvent {
     depositId: string;
     user: string;
     amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ExecutedEvent {
+  export type InputTuple = [excuteId: BytesLike];
+  export type OutputTuple = [excuteId: string];
+  export interface OutputObject {
+    excuteId: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -261,6 +293,12 @@ export interface IEVMVault extends BaseContract {
 
   balanceOf: TypedContractMethod<[account: AddressLike], [bigint], "view">;
 
+  collectFees: TypedContractMethod<
+    [receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   creatorFees: TypedContractMethod<[], [bigint], "view">;
 
   deposit: TypedContractMethod<
@@ -273,6 +311,18 @@ export interface IEVMVault extends BaseContract {
       signature: BytesLike
     ],
     [bigint],
+    "nonpayable"
+  >;
+
+  execute: TypedContractMethod<
+    [
+      excuteId: BytesLike,
+      targets: AddressLike[],
+      data: BytesLike[],
+      deadline: BigNumberish,
+      signature: BytesLike
+    ],
+    [void],
     "nonpayable"
   >;
 
@@ -333,6 +383,9 @@ export interface IEVMVault extends BaseContract {
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[account: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "collectFees"
+  ): TypedContractMethod<[receiver: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "creatorFees"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -347,6 +400,19 @@ export interface IEVMVault extends BaseContract {
       signature: BytesLike
     ],
     [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "execute"
+  ): TypedContractMethod<
+    [
+      excuteId: BytesLike,
+      targets: AddressLike[],
+      data: BytesLike[],
+      deadline: BigNumberish,
+      signature: BytesLike
+    ],
+    [void],
     "nonpayable"
   >;
   getFunction(
@@ -407,6 +473,13 @@ export interface IEVMVault extends BaseContract {
     DepositedEvent.OutputObject
   >;
   getEvent(
+    key: "Executed"
+  ): TypedContractEvent<
+    ExecutedEvent.InputTuple,
+    ExecutedEvent.OutputTuple,
+    ExecutedEvent.OutputObject
+  >;
+  getEvent(
     key: "Transfer"
   ): TypedContractEvent<
     TransferEvent.InputTuple,
@@ -442,6 +515,17 @@ export interface IEVMVault extends BaseContract {
       DepositedEvent.InputTuple,
       DepositedEvent.OutputTuple,
       DepositedEvent.OutputObject
+    >;
+
+    "Executed(bytes16)": TypedContractEvent<
+      ExecutedEvent.InputTuple,
+      ExecutedEvent.OutputTuple,
+      ExecutedEvent.OutputObject
+    >;
+    Executed: TypedContractEvent<
+      ExecutedEvent.InputTuple,
+      ExecutedEvent.OutputTuple,
+      ExecutedEvent.OutputObject
     >;
 
     "Transfer(address,address,uint256)": TypedContractEvent<

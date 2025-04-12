@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+import {IProtocolHelper} from "./interfaces/IProtocolHelper.sol";
 import {IEVMVault} from "./interfaces/IVault.sol";
 import {IEVMVaultFactory} from "./interfaces/IVaultFactory.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -12,6 +13,11 @@ import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
     using SafeERC20 for IERC20;
+
+    bytes32 public constant EXECUTE_TYPEHASH =
+        keccak256(
+            "Execute(bytes16 excuteId,address[] targets,bytes[] data,uint256 deadline)"
+        );
 
     bytes32 public constant DEPOSIT_TYPEHASH =
         keccak256(
@@ -49,6 +55,11 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
     uint256 public maxDepositAmount;
 
     /**
+     * @notice The protocol helper of the vault
+     */
+    IProtocolHelper public immutable protocolHelper;
+
+    /**
      * @notice The user deposited amount of the vault
      */
     mapping(address => uint256) public userDeposited;
@@ -75,6 +86,7 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
         authority = params.authority;
         minDepositAmount = params.minDepositAmount;
         maxDepositAmount = params.maxDepositAmount;
+        protocolHelper = IProtocolHelper(params.protocolHelper);
 
         factory = IEVMVaultFactory(msg.sender);
     }
@@ -85,6 +97,7 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
      */
     function getVaultValue() public view returns (uint256) {
         return
+            protocolHelper.getVaultValue(this) +
             underlying.balanceOf(address(this)) -
             (vaultFees + creatorFees);
     }
@@ -97,6 +110,28 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
         uint256 totalShares = totalSupply();
         return
             (totalShares == 0) ? 1e18 : (getVaultValue() * 1e18) / totalShares;
+    }
+
+    /**
+     * @notice Update the minimum deposit amount
+     * @param newMinDepositAmount The new minimum deposit amount
+     */
+    function updateMinDepositAmount(uint256 newMinDepositAmount) external {
+        require(msg.sender == authority, "Unauthorized");
+        minDepositAmount = newMinDepositAmount;
+    }
+
+    /**
+     * @notice Update the maximum deposit amount
+     * @param newMaxDepositAmount The new maximum deposit amount
+     */
+    function updateMaxDepositAmount(uint256 newMaxDepositAmount) external {
+        require(msg.sender == authority, "Unauthorized");
+        require(
+            newMaxDepositAmount >= minDepositAmount,
+            "Invalid max deposit amount"
+        );
+        maxDepositAmount = newMaxDepositAmount;
     }
 
     /**
@@ -155,6 +190,15 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
 
         underlying.safeTransferFrom(msg.sender, address(this), amount);
         userDeposited[user] += amount;
+
+        _executeWithProcolHelper(
+            address(protocolHelper),
+            abi.encodeWithSignature(
+                "onDeposit(address,uint256)",
+                address(this),
+                amount
+            )
+        );
 
         uint256 totalShares = totalSupply();
         uint256 shares = (totalShares == 0)
@@ -247,6 +291,15 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
             _burn(user, (balanceOf(user) * amountOut) / userTvl);
         }
 
+        _executeWithProcolHelper(
+            address(protocolHelper),
+            abi.encodeWithSignature(
+                "onWithdraw(address,uint256)",
+                address(this),
+                amountOut
+            )
+        );
+
         underlying.safeTransfer(user, amountOut - (vaultFee + creatorFee));
         vaultFees += vaultFee;
         creatorFees += creatorFee;
@@ -255,7 +308,98 @@ contract EVMVault is IEVMVault, ERC20, EIP712, ReentrancyGuard {
 
         emit Withdrawn(withdrawId, user, amountOut);
     }
-    
+
+    /**
+     * @notice Execute a transaction
+     * @param excuteId The execute id
+     * @param targets The targets to call
+     * @param data The data to call
+     * @param deadline The deadline of the execute
+     * @param signature The signature of the execute
+     */
+    function execute(
+        bytes16 excuteId,
+        address[] calldata targets,
+        bytes[] calldata data,
+        uint256 deadline,
+        bytes calldata signature
+    ) external override nonReentrant {
+        require(block.timestamp < deadline, "Deadline exceeded");
+        require(excuteIds[excuteId] == false, "Excute already exists");
+
+        bytes32[] memory hashedDatas = new bytes32[](targets.length);
+
+        for (uint256 i = 0; i < targets.length; ) {
+            (bool success, ) = targets[i].call(data[i]);
+            require(success, "execute: call failed");
+
+            hashedDatas[i] = keccak256(data[i]);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                EXECUTE_TYPEHASH,
+                excuteId,
+                keccak256(abi.encodePacked(targets)),
+                keccak256(abi.encodePacked(hashedDatas)),
+                deadline
+            )
+        );
+        bytes32 digest = _hashTypedDataV4(structHash);
+        address signer = ECDSA.recover(digest, signature);
+        require(signer == factory.signer(), "Invalid signature");
+
+        excuteIds[excuteId] = true;
+
+        emit Executed(excuteId);
+    }
+
+    function _executeWithProcolHelper(
+        address protocolHelperAddress,
+        bytes memory dataEncoded
+    ) internal {
+        (
+            bool successProtocolHelper,
+            bytes memory procolHelperReturn
+        ) = protocolHelperAddress.call(dataEncoded);
+        require(successProtocolHelper, "execute: call failed");
+
+        (address[] memory targets, bytes[] memory data) = abi.decode(
+            procolHelperReturn,
+            (address[], bytes[])
+        );
+
+        for (uint256 i = 0; i < targets.length; i++) {
+            (bool success, ) = address(targets[i]).call(data[i]);
+            require(success, "Call failed");
+        }
+    }
+
+    /**
+     * @notice Collect fees from the vault
+     * @param receiver The receiver of the fees
+     */
+    function collectFees(address receiver) external {
+        require(msg.sender == address(factory), "Unauthorized");
+        underlying.safeTransfer(receiver, vaultFees);
+        vaultFees = 0;
+    }
+
+    /**
+     * @notice Collect creator fees from the vault
+     * @param receiver The receiver of the creator fees
+     */
+    function collectCreatorFees(address receiver) external {
+        require(msg.sender == authority, "Unauthorized");
+        require(creatorFees > 0, "No creator fees");
+        underlying.safeTransfer(receiver, creatorFees);
+        creatorFees = 0;
+    }
+
     fallback() external payable {}
 
     receive() external payable {}

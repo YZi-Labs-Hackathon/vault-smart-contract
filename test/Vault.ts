@@ -1,6 +1,6 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { EVMVaultFactory } from "../types/evm";
-import { TestERC20Factory, EVMVault } from "../types/evm";
+import { ERC20, TestERC20Factory, EVMVault } from "../types/evm";
 import { EventLog, TypedDataDomain, TypedDataField } from "ethers";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import assert from "assert";
@@ -66,6 +66,7 @@ describe("VaultFactory EVM", () => {
         const vaultFactoryValue = {
             authority: vaultCreator.address,
             deadline: deadline,
+            protocolHelper: ethers.ZeroAddress,  // TODO: Add protocol helper
             name: "Test Vault",
             symbol: "TV",
             underlying: await token.getAddress(),

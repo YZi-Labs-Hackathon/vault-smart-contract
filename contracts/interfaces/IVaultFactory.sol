@@ -10,10 +10,11 @@ interface IEVMVaultFactory {
         string symbol;
         IERC20 underlying;
         address authority; // The authority of the vault
+        address protocolHelper; // The protocol helper of the vault
         uint256 initDepositAmount; // The amount of the underlying token to deposit into the vault
         uint256 minDepositAmount; // The minimum amount of the underlying token to deposit into the vault
         uint256 maxDepositAmount; // The maximum amount of the underlying token to deposit into the vault
-        uint256 deadline; // The deadline of creating the vault 
+        uint256 deadline; // The deadline of creating the vault
     }
 
     event VaultCreated(IEVMVault vault, address authority, uint256 shares);
@@ -24,4 +25,6 @@ interface IEVMVaultFactory {
     ) external returns (IEVMVault vault);
 
     function signer() external view returns (address);
+
+    function collectFees(IEVMVault vault, address receiver) external;
 }

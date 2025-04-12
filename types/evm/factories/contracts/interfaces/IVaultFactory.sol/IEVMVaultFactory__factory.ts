@@ -37,6 +37,24 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "contract IEVMVault",
+        name: "vault",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "collectFees",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         components: [
           {
             internalType: "string",
@@ -56,6 +74,11 @@ const _abi = [
           {
             internalType: "address",
             name: "authority",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "protocolHelper",
             type: "address",
           },
           {

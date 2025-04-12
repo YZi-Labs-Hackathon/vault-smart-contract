@@ -29,6 +29,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: AddressLike;
     authority: AddressLike;
+    protocolHelper: AddressLike;
     initDepositAmount: BigNumberish;
     minDepositAmount: BigNumberish;
     maxDepositAmount: BigNumberish;
@@ -40,6 +41,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string,
     underlying: string,
     authority: string,
+    protocolHelper: string,
     initDepositAmount: bigint,
     minDepositAmount: bigint,
     maxDepositAmount: bigint,
@@ -49,6 +51,7 @@ export declare namespace IEVMVaultFactory {
     symbol: string;
     underlying: string;
     authority: string;
+    protocolHelper: string;
     initDepositAmount: bigint;
     minDepositAmount: bigint;
     maxDepositAmount: bigint;
@@ -60,6 +63,7 @@ export interface EVMVaultFactoryInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "CREATE_VAULT_TYPEHASH"
+      | "collectFees"
       | "createNewVault"
       | "eip712Domain"
       | "getVaultAddress"
@@ -68,6 +72,7 @@ export interface EVMVaultFactoryInterface extends Interface {
       | "renounceOwnership"
       | "signer"
       | "transferOwnership"
+      | "updateSigner"
   ): FunctionFragment;
 
   getEvent(
@@ -81,6 +86,10 @@ export interface EVMVaultFactoryInterface extends Interface {
   encodeFunctionData(
     functionFragment: "CREATE_VAULT_TYPEHASH",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collectFees",
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createNewVault",
@@ -108,9 +117,17 @@ export interface EVMVaultFactoryInterface extends Interface {
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "updateSigner",
+    values: [AddressLike]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "CREATE_VAULT_TYPEHASH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "collectFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -134,6 +151,10 @@ export interface EVMVaultFactoryInterface extends Interface {
   decodeFunctionResult(functionFragment: "signer", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateSigner",
     data: BytesLike
   ): Result;
 }
@@ -236,6 +257,12 @@ export interface EVMVaultFactory extends BaseContract {
 
   CREATE_VAULT_TYPEHASH: TypedContractMethod<[], [string], "view">;
 
+  collectFees: TypedContractMethod<
+    [vault: AddressLike, receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   createNewVault: TypedContractMethod<
     [params: IEVMVaultFactory.CreateNewVaultParamsStruct, signature: BytesLike],
     [string],
@@ -276,6 +303,12 @@ export interface EVMVaultFactory extends BaseContract {
     "nonpayable"
   >;
 
+  updateSigner: TypedContractMethod<
+    [_signer: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -283,6 +316,13 @@ export interface EVMVaultFactory extends BaseContract {
   getFunction(
     nameOrSignature: "CREATE_VAULT_TYPEHASH"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "collectFees"
+  ): TypedContractMethod<
+    [vault: AddressLike, receiver: AddressLike],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "createNewVault"
   ): TypedContractMethod<
@@ -329,6 +369,9 @@ export interface EVMVaultFactory extends BaseContract {
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updateSigner"
+  ): TypedContractMethod<[_signer: AddressLike], [void], "nonpayable">;
 
   getEvent(
     key: "EIP712DomainChanged"

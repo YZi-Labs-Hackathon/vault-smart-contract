@@ -46,6 +46,8 @@ export type { ShortStrings } from "./@openzeppelin/contracts/utils/ShortStrings"
 export { ShortStrings__factory } from "./factories/@openzeppelin/contracts/utils/ShortStrings__factory";
 export type { Strings } from "./@openzeppelin/contracts/utils/Strings";
 export { Strings__factory } from "./factories/@openzeppelin/contracts/utils/Strings__factory";
+export type { IProtocolHelper } from "./contracts/interfaces/IProtocolHelper";
+export { IProtocolHelper__factory } from "./factories/contracts/interfaces/IProtocolHelper__factory";
 export type { IEVMVault } from "./contracts/interfaces/IVault.sol/IEVMVault";
 export { IEVMVault__factory } from "./factories/contracts/interfaces/IVault.sol/IEVMVault__factory";
 export type { IEVMVaultFactory } from "./contracts/interfaces/IVaultFactory.sol/IEVMVaultFactory";
