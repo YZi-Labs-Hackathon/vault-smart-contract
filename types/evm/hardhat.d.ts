@@ -106,9 +106,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IEVMVaultFactory__factory>;
     getContractFactory(
+      name: "Pancake",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Pancake__factory>;
+    getContractFactory(
       name: "TestERC20Factory",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TestERC20Factory__factory>;
+    getContractFactory(
+      name: "TestProtocol",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TestProtocol__factory>;
+    getContractFactory(
+      name: "ITestProtocolFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ITestProtocolFactory__factory>;
+    getContractFactory(
+      name: "TestProtocolFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TestProtocolFactory__factory>;
     getContractFactory(
       name: "EVMVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -234,10 +250,30 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IEVMVaultFactory>;
     getContractAt(
+      name: "Pancake",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Pancake>;
+    getContractAt(
       name: "TestERC20Factory",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.TestERC20Factory>;
+    getContractAt(
+      name: "TestProtocol",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TestProtocol>;
+    getContractAt(
+      name: "ITestProtocolFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ITestProtocolFactory>;
+    getContractAt(
+      name: "TestProtocolFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TestProtocolFactory>;
     getContractAt(
       name: "EVMVault",
       address: string | ethers.Addressable,
@@ -342,9 +378,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IEVMVaultFactory>;
     deployContract(
+      name: "Pancake",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Pancake>;
+    deployContract(
       name: "TestERC20Factory",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.TestERC20Factory>;
+    deployContract(
+      name: "TestProtocol",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestProtocol>;
+    deployContract(
+      name: "ITestProtocolFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ITestProtocolFactory>;
+    deployContract(
+      name: "TestProtocolFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestProtocolFactory>;
     deployContract(
       name: "EVMVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -470,10 +522,30 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IEVMVaultFactory>;
     deployContract(
+      name: "Pancake",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Pancake>;
+    deployContract(
       name: "TestERC20Factory",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.TestERC20Factory>;
+    deployContract(
+      name: "TestProtocol",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestProtocol>;
+    deployContract(
+      name: "ITestProtocolFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ITestProtocolFactory>;
+    deployContract(
+      name: "TestProtocolFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestProtocolFactory>;
     deployContract(
       name: "EVMVault",
       args: any[],

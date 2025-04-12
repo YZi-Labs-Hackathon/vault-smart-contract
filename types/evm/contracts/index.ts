@@ -7,5 +7,7 @@ import type * as vaultFactorySol from "./VaultFactory.sol";
 export type { vaultFactorySol };
 import type * as interfaces from "./interfaces";
 export type { interfaces };
+import type * as protocols from "./protocols";
+export type { protocols };
 import type * as utils from "./utils";
 export type { utils };
