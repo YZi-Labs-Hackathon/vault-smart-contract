@@ -224,4 +224,44 @@ describe("VaultFactory EVM", () => {
             }
         });
     });
+
+    it("should execute a transaction", async () => {
+        const deadline = Math.floor(Date.now() / 1000) + 1000;
+
+        const vaultDomain: TypedDataDomain = {
+            name: "Partnr Vault",
+            version: "1.0",
+            chainId: (await ethers.provider.getNetwork()).chainId,
+            verifyingContract: await vault.getAddress(),
+        };
+        const executeTypes: Record<string, TypedDataField[]> = {
+            "Execute": [
+                { name: "excuteId", type: "bytes16" },
+                { name: "targets", type: "address[]" },
+                { name: "data", type: "bytes[]" },
+                { name: "deadline", type: "uint256" }
+            ]
+        };
+
+        const executeValue = {
+            excuteId: ethers.randomBytes(16),
+            targets: [await token.getAddress()],
+            data: [token.interface.encodeFunctionData("transfer", [user1.address, ethers.parseUnits("100", await token.decimals())])],
+            deadline: deadline
+        };
+
+        const executeSignature = await signer.signTypedData(vaultDomain, executeTypes, executeValue);
+
+        const beforeBalance = await token.balanceOf(user1.address);
+        const vaultValue = await vault.getVaultValue();
+
+        const executeTx = await vault.connect(user1).execute(executeValue.excuteId, executeValue.targets, executeValue.data, executeValue.deadline, executeSignature);
+        const executeTxReceipt = await executeTx.wait();
+
+        const finalBalance = await token.balanceOf(user1.address);
+        const finalVaultValue = await vault.getVaultValue();
+        assert(finalBalance > beforeBalance, "Balance should be greater than before");
+        assert(finalVaultValue < vaultValue, "Vault value should be less than before");
+    });
+
 });
