@@ -33,41 +33,16 @@ const config: HardhatUserConfig = {
             },
             loggingEnabled: false
         },
-        mainnet: {
-            accounts: [process.env.PK],
-            chainId: 1,
-            url: 'https://rpc.ankr.com/eth'
-        },
-        polygon: {
-            accounts: [process.env.PK],
-            chainId: 137,
-            url: 'https://polygon-rpc.com'
-        },
         bsc: {
             accounts: [process.env.PK],
             chainId: 56,
-            url: 'https://go.getblock.io/20fc6cc909a040f18c500b6dae99c09b'
-        },
-        avalanche: {
-            accounts: [process.env.PK],
-            chainId: 43114,
-            url: 'https://api.avax.network/ext/bc/C/rpc'
-        },
-        mirai: {
-            accounts: [process.env.PK],
-            chainId: 2718,
-            url: 'https://rpc1.miraichain.io'
+            url: 'https://bsc.rpc.blxrbdn.com'
         },
         bsctest: {
             accounts: [process.env.PK],
             chainId: 97,
             url: 'https://bsc-testnet-rpc.publicnode.com'
         },
-        miraitest: {
-            accounts: [process.env.PK],
-            chainId: 2195,
-            url: 'https://rpc1-testnet.miraichain.io'
-        }
     },
 
     typechain: {

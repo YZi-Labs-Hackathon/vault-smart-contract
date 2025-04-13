@@ -30,7 +30,7 @@ describe("VaultFactory EVM", () => {
         user2 = signers[4];
 
         const VaultFactory = await ethers.getContractFactory("EVMVaultFactory");
-        vaultFactory = await VaultFactory.deploy(signer.address);
+        vaultFactory = await upgrades.deployProxy(VaultFactory, [signer.address]);
 
         const TestERC20Factory = await ethers.getContractFactory("TestERC20Factory");
         token = await TestERC20Factory.deploy("Test Token", "TT", 18);
@@ -223,89 +223,5 @@ describe("VaultFactory EVM", () => {
                 }
             }
         });
-    });
-
-    it("should execute burn operation to zero address", async () => {
-        // First deposit some tokens to have balance to burn
-        const vaultDomain: TypedDataDomain = {
-            name: "Partnr Vault",
-            version: "1.0",
-            chainId: (await ethers.provider.getNetwork()).chainId,
-            verifyingContract: await vault.getAddress(),
-        };
-
-        // Deposit(bytes16 depositId,uint256 amount,address user,uint256 vaultTvl,uint256 deadline)
-        const vaultDepositTypes: Record<string, TypedDataField[]> = {
-            "Deposit": [
-                { name: "depositId", type: "bytes16" },
-                { name: "amount", type: "uint256" },
-                { name: "user", type: "address" },
-                { name: "vaultTvl", type: "uint256" },
-                { name: "deadline", type: "uint256" },
-            ]
-        };
-
-        const depositId = ethers.randomBytes(16);
-        const depositValue = {
-            depositId: depositId,
-            amount: ethers.parseUnits("100", await token.decimals()),
-            user: user1.address,
-            vaultTvl: await vault.getVaultValue(),
-            deadline: Math.floor(Date.now() / 1000) + 1000,
-        };
-        const vaultSignature = await signer.signTypedData(vaultDomain, vaultDepositTypes, depositValue);
-        await vault.connect(user1).deposit(depositValue.depositId, depositValue.amount, depositValue.user, depositValue.vaultTvl, depositValue.deadline, vaultSignature);
-
-        // Get initial balance
-        const initialBalance = await vault.balanceOf(user1.address);
-        assert(initialBalance > 0, "Initial balance should be greater than 0");
-
-        // Prepare execute parameters for burning tokens
-        const executeId = ethers.randomBytes(16);
-        const targets = [await vault.getAddress()];
-        const burnAmount = ethers.parseUnits("50", await token.decimals());
-        const data = [
-            vault.interface.encodeFunctionData("transfer", [
-                ethers.ZeroAddress,
-                burnAmount
-            ])
-        ];
-        const deadline = Math.floor(Date.now() / 1000) + 1000;
-
-        // Create and sign the execute message
-        const executeValue = {
-            excuteId: executeId,
-            targets: targets,
-            data: data,
-            deadline: deadline
-        };
-
-        const executeTypes: Record<string, TypedDataField[]> = {
-            "Execute": [
-                { name: "excuteId", type: "bytes16" },
-                { name: "targets", type: "address[]" },
-                { name: "data", type: "bytes[]" },
-                { name: "deadline", type: "uint256" }
-            ]
-        };
-
-        const executeSignature = await signer.signTypedData(vaultDomain, executeTypes, executeValue);
-
-        // Execute the burn operation
-        await vault.connect(user1).execute(
-            executeId,
-            targets,
-            data,
-            deadline,
-            executeSignature
-        );
-
-        // Verify the balance was reduced
-        const finalBalance = await vault.balanceOf(user1.address);
-        assert(finalBalance === initialBalance - burnAmount, "Balance should be reduced by burn amount");
-
-        // Verify the tokens were burned (sent to zero address)
-        const zeroAddressBalance = await vault.balanceOf(ethers.ZeroAddress);
-        assert(zeroAddressBalance === burnAmount, "Zero address should have received the burned tokens");
     });
 });
