@@ -6,6 +6,8 @@ import 'hardhat-deploy';
 import "hardhat-gas-reporter";
 import { config as dotenvConfig } from 'dotenv';
 import { resolve } from 'path';
+import "@nomicfoundation/hardhat-verify";
+
 const dotenvConfigPath: string = process.env.DOTENV_CONFIG_PATH || './.env';
 dotenvConfig({ path: resolve(__dirname, dotenvConfigPath) });
 
@@ -48,7 +50,11 @@ const config: HardhatUserConfig = {
     typechain: {
         outDir: 'types/evm',
         target: 'ethers-v6'
-    }
+    },
+
+    sourcify: {
+        enabled: true
+    },
 };
 
 export default config;
